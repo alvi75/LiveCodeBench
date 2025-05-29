@@ -215,3 +215,45 @@ For more details, please refer to our website at [livecodebench.github.io](https
   journal   = {arXiv preprint},
 }
 ```
+
+
+## Using a Custom Dataset CSV
+
+If you wish to evaluate LiveCodeBench with a custom dataset (e.g., preprocessed natural language inputs), you can directly modify the dataset loading path in the benchmark script.
+
+Step 1: Edit the Dataset Path
+
+Go to the file lcb_runner/benchmarks/code_generation_benchmark.py
+Line 127 (inside the load_code_generation_dataset() function) should be updated as follows:
+
+```
+df = pd.read_csv("/scratch/alvi/livecodebench_datasets/question_content_no_punct_spacy.csv")
+dataset = [CodeGenerationProblem(**row.to_dict()) for _, row in df.iterrows()]
+```
+
+This loads your custom CSV file instead of the default Hugging Face dataset.
+
+
+Step 2: Run Evaluation with Your Custom Dataset
+
+Use the following command to run model inference and evaluation:
+
+```
+python -m lcb_runner.runner.main \
+  --model deepseek-ai/deepseek-coder-1.3b-instruct \
+  --scenario codegeneration \
+  --evaluate \
+  --release_version release_v1 \
+  --n 1 \
+  --use_cache \
+  --temperature 0.0 \
+  --tensor_parallel_size 1
+```
+
+This will evaluate the model using your modified dataset located at:
+
+```
+/scratch/alvi/livecodebench_datasets/question_content_no_punct_spacy.csv
+```
+
+
